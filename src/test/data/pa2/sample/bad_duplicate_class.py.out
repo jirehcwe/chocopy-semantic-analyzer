@@ -1,0 +1,185 @@
+{
+  "kind" : "Program",
+  "declarations" : [ {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "A",
+      "location" : [ 1, 7, 1, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "object",
+      "location" : [ 1, 9, 1, 14 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 2, 5, 2, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 2, 7, 2, 9 ]
+        },
+        "location" : [ 2, 5, 2, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 2, 13, 2, 13 ]
+      },
+      "location" : [ 2, 5, 2, 13 ]
+    } ],
+    "location" : [ 1, 1, 2, 13 ]
+  }, {
+    "kind" : "VarDef",
+    "var" : {
+      "kind" : "TypedVar",
+      "identifier" : {
+        "kind" : "Identifier",
+        "name" : "z",
+        "location" : [ 4, 1, 4, 1 ]
+      },
+      "type" : {
+        "kind" : "ClassType",
+        "className" : "bool",
+        "location" : [ 4, 3, 4, 6 ]
+      },
+      "location" : [ 4, 1, 4, 6 ]
+    },
+    "value" : {
+      "kind" : "BooleanLiteral",
+      "value" : true,
+      "location" : [ 4, 10, 4, 13 ]
+    },
+    "location" : [ 4, 1, 4, 13 ]
+  }, {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "A",
+      "location" : [ 7, 7, 7, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "object",
+      "location" : [ 7, 9, 7, 14 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 8, 5, 8, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 8, 7, 8, 9 ]
+        },
+        "location" : [ 8, 5, 8, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 8, 13, 8, 13 ]
+      },
+      "location" : [ 8, 5, 8, 13 ]
+    } ],
+    "location" : [ 7, 1, 8, 13 ]
+  }, {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "str",
+      "location" : [ 11, 7, 11, 9 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "object",
+      "location" : [ 11, 11, 11, 16 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 12, 5, 12, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 12, 7, 12, 9 ]
+        },
+        "location" : [ 12, 5, 12, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 12, 13, 12, 13 ]
+      },
+      "location" : [ 12, 5, 12, 13 ]
+    } ],
+    "location" : [ 11, 1, 12, 13 ]
+  }, {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "z",
+      "location" : [ 15, 7, 15, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "object",
+      "location" : [ 15, 9, 15, 14 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 16, 5, 16, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 16, 7, 16, 9 ]
+        },
+        "location" : [ 16, 5, 16, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 16, 13, 16, 13 ]
+      },
+      "location" : [ 16, 5, 16, 13 ]
+    } ],
+    "location" : [ 15, 1, 16, 13 ]
+  } ],
+  "statements" : [ {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "CallExpr",
+      "function" : {
+        "kind" : "Identifier",
+        "name" : "A",
+        "location" : [ 18, 1, 18, 1 ]
+      },
+      "args" : [ ],
+      "location" : [ 18, 1, 18, 3 ]
+    },
+    "location" : [ 18, 1, 18, 3 ]
+  } ],
+  "location" : [ 1, 1, 18, 3 ]
+}

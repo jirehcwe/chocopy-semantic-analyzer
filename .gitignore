@@ -1,0 +1,9 @@
+*.iml
+.idea
+*.class
+target/
+*.DS_store
+**/student_contributed/*.out*
+/pa1
+/pa2
+*.swp

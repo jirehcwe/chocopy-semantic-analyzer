@@ -1,0 +1,24 @@
+{
+  "kind" : "Program",
+  "declarations" : [ ],
+  "statements" : [ {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "BinaryExpr",
+      "left" : {
+        "kind" : "IntegerLiteral",
+        "value" : 6,
+        "location" : [ 1, 1, 1, 1 ]
+      },
+      "operator" : "*",
+      "right" : {
+        "kind" : "IntegerLiteral",
+        "value" : 9,
+        "location" : [ 1, 5, 1, 5 ]
+      },
+      "location" : [ 1, 1, 1, 5 ]
+    },
+    "location" : [ 1, 1, 1, 5 ]
+  } ],
+  "location" : [ 1, 1, 1, 5 ]
+}

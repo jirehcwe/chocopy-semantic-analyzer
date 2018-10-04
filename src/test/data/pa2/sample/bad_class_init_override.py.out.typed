@@ -1,0 +1,9 @@
+{
+  "errors" : [ {
+    "kind" : "SemanticError",
+    "message" : "Method overridden with different type signature: __init__",
+    "location" : [ 4, 9, 4, 16 ]
+  } ],
+  "kind" : "Errors",
+  "location" : [ 0, 0, 0, 0 ]
+}

@@ -1,0 +1,151 @@
+{
+  "kind" : "Program",
+  "declarations" : [ {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "A",
+      "location" : [ 1, 7, 1, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "object",
+      "location" : [ 1, 9, 1, 14 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 2, 5, 2, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 2, 7, 2, 9 ]
+        },
+        "location" : [ 2, 5, 2, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 2, 13, 2, 13 ]
+      },
+      "location" : [ 2, 5, 2, 13 ]
+    }, {
+      "kind" : "FuncDef",
+      "name" : {
+        "kind" : "Identifier",
+        "name" : "foo",
+        "location" : [ 4, 9, 4, 11 ]
+      },
+      "params" : [ {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "self",
+          "location" : [ 4, 13, 4, 16 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "A",
+          "location" : [ 4, 19, 4, 21 ]
+        },
+        "location" : [ 4, 13, 4, 21 ]
+      } ],
+      "returnType" : {
+        "kind" : "ClassType",
+        "className" : "int",
+        "location" : [ 4, 27, 4, 29 ]
+      },
+      "declarations" : [ ],
+      "statements" : [ {
+        "kind" : "ReturnStmt",
+        "value" : {
+          "kind" : "IntegerLiteral",
+          "value" : 0,
+          "location" : [ 5, 16, 5, 16 ]
+        },
+        "location" : [ 5, 9, 5, 16 ]
+      } ],
+      "location" : [ 4, 5, 5, 16 ]
+    }, {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 7, 5, 7, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 7, 7, 7, 9 ]
+        },
+        "location" : [ 7, 5, 7, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 7, 13, 7, 13 ]
+      },
+      "location" : [ 7, 5, 7, 13 ]
+    }, {
+      "kind" : "FuncDef",
+      "name" : {
+        "kind" : "Identifier",
+        "name" : "foo",
+        "location" : [ 9, 9, 9, 11 ]
+      },
+      "params" : [ {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "self",
+          "location" : [ 9, 13, 9, 16 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "A",
+          "location" : [ 9, 19, 9, 21 ]
+        },
+        "location" : [ 9, 13, 9, 21 ]
+      } ],
+      "returnType" : {
+        "kind" : "ClassType",
+        "className" : "int",
+        "location" : [ 9, 27, 9, 29 ]
+      },
+      "declarations" : [ ],
+      "statements" : [ {
+        "kind" : "ReturnStmt",
+        "value" : {
+          "kind" : "IntegerLiteral",
+          "value" : 0,
+          "location" : [ 10, 16, 10, 16 ]
+        },
+        "location" : [ 10, 9, 10, 16 ]
+      } ],
+      "location" : [ 9, 5, 10, 16 ]
+    } ],
+    "location" : [ 1, 1, 10, 16 ]
+  } ],
+  "statements" : [ {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "CallExpr",
+      "function" : {
+        "kind" : "Identifier",
+        "name" : "A",
+        "location" : [ 12, 1, 12, 1 ]
+      },
+      "args" : [ ],
+      "location" : [ 12, 1, 12, 3 ]
+    },
+    "location" : [ 12, 1, 12, 3 ]
+  } ],
+  "location" : [ 1, 1, 12, 3 ]
+}

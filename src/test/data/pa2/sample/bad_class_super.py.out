@@ -1,0 +1,149 @@
+{
+  "kind" : "Program",
+  "declarations" : [ {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "A",
+      "location" : [ 2, 7, 2, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "B",
+      "location" : [ 2, 9, 2, 9 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 3, 5, 3, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 3, 7, 3, 9 ]
+        },
+        "location" : [ 3, 5, 3, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 3, 13, 3, 13 ]
+      },
+      "location" : [ 3, 5, 3, 13 ]
+    } ],
+    "location" : [ 2, 1, 3, 13 ]
+  }, {
+    "kind" : "VarDef",
+    "var" : {
+      "kind" : "TypedVar",
+      "identifier" : {
+        "kind" : "Identifier",
+        "name" : "z",
+        "location" : [ 5, 1, 5, 1 ]
+      },
+      "type" : {
+        "kind" : "ClassType",
+        "className" : "int",
+        "location" : [ 5, 3, 5, 5 ]
+      },
+      "location" : [ 5, 1, 5, 5 ]
+    },
+    "value" : {
+      "kind" : "IntegerLiteral",
+      "value" : 2,
+      "location" : [ 5, 9, 5, 9 ]
+    },
+    "location" : [ 5, 1, 5, 9 ]
+  }, {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "B",
+      "location" : [ 8, 7, 8, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "z",
+      "location" : [ 8, 9, 8, 9 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 9, 5, 9, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 9, 7, 9, 9 ]
+        },
+        "location" : [ 9, 5, 9, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 9, 13, 9, 13 ]
+      },
+      "location" : [ 9, 5, 9, 13 ]
+    } ],
+    "location" : [ 8, 1, 9, 13 ]
+  }, {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "C",
+      "location" : [ 12, 7, 12, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "int",
+      "location" : [ 12, 9, 12, 11 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "x",
+          "location" : [ 13, 5, 13, 5 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 13, 7, 13, 9 ]
+        },
+        "location" : [ 13, 5, 13, 9 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 13, 13, 13, 13 ]
+      },
+      "location" : [ 13, 5, 13, 13 ]
+    } ],
+    "location" : [ 12, 1, 13, 13 ]
+  } ],
+  "statements" : [ {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "CallExpr",
+      "function" : {
+        "kind" : "Identifier",
+        "name" : "A",
+        "location" : [ 15, 1, 15, 1 ]
+      },
+      "args" : [ ],
+      "location" : [ 15, 1, 15, 3 ]
+    },
+    "location" : [ 15, 1, 15, 3 ]
+  } ],
+  "location" : [ 2, 1, 15, 3 ]
+}

@@ -1,0 +1,72 @@
+{
+  "kind" : "Program",
+  "declarations" : [ ],
+  "statements" : [ {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "BinaryExpr",
+      "left" : {
+        "kind" : "StringLiteral",
+        "value" : "Hello",
+        "location" : [ 1, 1, 1, 7 ]
+      },
+      "operator" : "+",
+      "right" : {
+        "kind" : "ListExpr",
+        "elements" : [ {
+          "kind" : "StringLiteral",
+          "value" : "World",
+          "location" : [ 1, 12, 1, 18 ]
+        } ],
+        "location" : [ 1, 11, 1, 19 ]
+      },
+      "location" : [ 1, 1, 1, 19 ]
+    },
+    "location" : [ 1, 1, 1, 19 ]
+  }, {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "BinaryExpr",
+      "left" : {
+        "kind" : "IntegerLiteral",
+        "value" : 1,
+        "location" : [ 2, 1, 2, 1 ]
+      },
+      "operator" : "+",
+      "right" : {
+        "kind" : "ListExpr",
+        "elements" : [ {
+          "kind" : "IntegerLiteral",
+          "value" : 2,
+          "location" : [ 2, 6, 2, 6 ]
+        } ],
+        "location" : [ 2, 5, 2, 7 ]
+      },
+      "location" : [ 2, 1, 2, 7 ]
+    },
+    "location" : [ 2, 1, 2, 7 ]
+  }, {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "BinaryExpr",
+      "left" : {
+        "kind" : "ListExpr",
+        "elements" : [ ],
+        "location" : [ 3, 1, 3, 2 ]
+      },
+      "operator" : "+",
+      "right" : {
+        "kind" : "ListExpr",
+        "elements" : [ {
+          "kind" : "IntegerLiteral",
+          "value" : 1,
+          "location" : [ 3, 7, 3, 7 ]
+        } ],
+        "location" : [ 3, 6, 3, 8 ]
+      },
+      "location" : [ 3, 1, 3, 8 ]
+    },
+    "location" : [ 3, 1, 3, 8 ]
+  } ],
+  "location" : [ 1, 1, 3, 8 ]
+}
