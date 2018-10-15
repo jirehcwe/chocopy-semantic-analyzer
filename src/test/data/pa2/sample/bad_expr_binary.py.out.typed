@@ -163,7 +163,7 @@
       "typeError" : "Cannot apply operator `+` on types `bool` and `int`",
       "inferredType" : {
         "kind" : "ClassValueType",
-        "className" : "object"
+        "className" : "int"
       },
       "left" : {
         "kind" : "BooleanLiteral",
