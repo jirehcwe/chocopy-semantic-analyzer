@@ -1,0 +1,106 @@
+{
+  "kind" : "Program",
+  "declarations" : [ {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "A",
+      "location" : [ 1, 7, 1, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "object",
+      "location" : [ 1, 9, 1, 14 ]
+    },
+    "declarations" : [ {
+      "kind" : "VarDef",
+      "var" : {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "f",
+          "location" : [ 2, 2, 2, 2 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "int",
+          "location" : [ 2, 4, 2, 6 ]
+        },
+        "location" : [ 2, 2, 2, 6 ]
+      },
+      "value" : {
+        "kind" : "IntegerLiteral",
+        "value" : 3,
+        "location" : [ 2, 10, 2, 10 ]
+      },
+      "location" : [ 2, 2, 2, 10 ]
+    } ],
+    "location" : [ 1, 1, 2, 10 ]
+  }, {
+    "kind" : "ClassDef",
+    "name" : {
+      "kind" : "Identifier",
+      "name" : "B",
+      "location" : [ 4, 7, 4, 7 ]
+    },
+    "superClass" : {
+      "kind" : "Identifier",
+      "name" : "A",
+      "location" : [ 4, 9, 4, 9 ]
+    },
+    "declarations" : [ {
+      "kind" : "FuncDef",
+      "name" : {
+        "kind" : "Identifier",
+        "name" : "f",
+        "location" : [ 5, 6, 5, 6 ]
+      },
+      "params" : [ {
+        "kind" : "TypedVar",
+        "identifier" : {
+          "kind" : "Identifier",
+          "name" : "self",
+          "location" : [ 5, 8, 5, 11 ]
+        },
+        "type" : {
+          "kind" : "ClassType",
+          "className" : "B",
+          "location" : [ 5, 13, 5, 13 ]
+        },
+        "location" : [ 5, 8, 5, 13 ]
+      } ],
+      "returnType" : {
+        "kind" : "ClassType",
+        "className" : "int",
+        "location" : [ 5, 19, 5, 21 ]
+      },
+      "declarations" : [ ],
+      "statements" : [ {
+        "kind" : "ReturnStmt",
+        "value" : {
+          "kind" : "IntegerLiteral",
+          "value" : 3,
+          "location" : [ 6, 10, 6, 10 ]
+        },
+        "location" : [ 6, 3, 6, 10 ]
+      } ],
+      "location" : [ 5, 2, 6, 10 ]
+    } ],
+    "location" : [ 4, 1, 6, 10 ]
+  } ],
+  "statements" : [ {
+    "kind" : "ExprStmt",
+    "expr" : {
+      "kind" : "CallExpr",
+      "function" : {
+        "kind" : "Identifier",
+        "name" : "A",
+        "location" : [ 8, 1, 8, 1 ]
+      },
+      "args" : [ ],
+      "location" : [ 8, 1, 8, 3 ]
+    },
+    "location" : [ 8, 1, 8, 3 ]
+  } ],
+  "location" : [ 1, 1, 8, 3 ]
+}
