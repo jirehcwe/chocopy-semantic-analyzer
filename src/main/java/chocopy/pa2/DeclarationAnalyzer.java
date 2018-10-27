@@ -39,7 +39,11 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
             SymbolType type = decl.dispatch(this);
 
             // Skip if error
-            if (type == null) continue;
+            if (type == null) {
+                //System.out.println("IT IS NULL!\n");
+                continue;
+            }
+            //System.out.println("IT IS NOT NULL!\n");
 
             // Add declaration to symbol table if it is new
             if (sym.declares(name)) {
@@ -53,6 +57,7 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
     }
 
     public SymbolType analyze(VarDef varDef) {
+        //System.out.println("USING VARDEF ANALYZE\n");
         return ValueType.annotationToValueType(varDef.var.type);
     }
 

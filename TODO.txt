@@ -1,0 +1,23 @@
+Add func analyze to DeclarationAnalyzer
+Add class analyze to DeclarationAnalyzer
+
+Fill out all types for TypeChecker?
+	For sym context changing, simply set ``sym = function.SymbolTable`` (or however we choose to structure it), run recursive dispatch(), and set ``sym = sym.parent``.
+
+Add func/class inner declaration analyze steps to the first pass in StudentAnalysis
+
+How to do function scope symbol tables?
+	one scope for each function? scope table itself takes care of inheritance
+	No, handle recursively in DeclarationAnalyzer, see below about SymbolType
+
+create new classes that inherit SymbolType (to be used in symbol table)
+	method/class class?
+		Could contain symbol scope reference
+
+Think about nonlocal, global, and class inheritance issues: can this symboltable design support?
+	I think so. Cannot set parent class as parent symboltable, i think? does parent environment count as a parent table?
+
+"""A class defines attributes and methods. A class inherits attributes and methods of its superclass. Attributes,
+whether defined in the current class or inherited from the superclass, cannot be redefined. Methods
+cannot be redefined in the same class. Inherited methods can be redefined as long as the return type and the
+types of all formal parameters except the first parameter are exactly the same."""

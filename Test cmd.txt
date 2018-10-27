@@ -1,0 +1,1 @@
+java -cp "target/assignment.jar;chocopy-ref.jar" chocopy.ChocoPy --pa2 chocopy.pa2.StudentAnalysis --dir src/test/data/pa2/sample --test
