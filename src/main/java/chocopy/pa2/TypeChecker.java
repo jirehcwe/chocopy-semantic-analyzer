@@ -145,6 +145,13 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
                     typeError(e, String.format("Cannot apply operator `%s` on types `%s` and `%s`", e.operator, t1, t2));
                     return (e.inferredType = BOOL_TYPE);
                 }
+            case "is":
+                if (!(BOOL_TYPE.equals(t1) || BOOL_TYPE.equals(t2) || INT_TYPE.equals(t1) || INT_TYPE.equals(t2) || STR_TYPE.equals(t1) || STR_TYPE.equals(t2)))
+                    return (e.inferredType = BOOL_TYPE);
+                else {
+                    typeError(e, String.format("Cannot apply operator `%s` on types `%s` and `%s`", e.operator, t1, t2));
+                    return (e.inferredType = BOOL_TYPE);
+                }
             default:
                 return (e.inferredType = OBJECT_TYPE);
         }
