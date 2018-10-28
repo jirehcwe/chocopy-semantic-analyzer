@@ -48,6 +48,32 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         s.expr.dispatch(this);
         return null;
     }
+    // For the While, If, and For loops, maybe have checks on condition/iterable?
+    @Override
+    public ValueType analyze(WhileStmt s) {
+        ValueType condType = s.condition.dispatch(this);
+        for (Stmt stmt : s.body)
+            stmt.dispatch(this);
+        return null;
+    }
+
+    @Override
+    public ValueType analyze(ForStmt s) {
+        ValueType condType = s.iterable.dispatch(this);
+        for (Stmt stmt : s.body)
+            stmt.dispatch(this);
+        return null;
+    }
+
+    @Override
+    public ValueType analyze(IfStmt s) {
+        ValueType condType = s.condition.dispatch(this);
+        for (Stmt stmt : s.thenBody)
+            stmt.dispatch(this);
+        for (Stmt stmt : s.elseBody)
+            stmt.dispatch(this);
+        return null;
+    }
 
     @Override
     public ValueType analyze(IntegerLiteral i) {
@@ -82,6 +108,30 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
                 typeError(vd, String.format("Cannot declare list variable `%s` to value `%s`", vd.var.identifier.name, literalType));
         }
         return null;
+    }
+
+    @Override
+    public ValueType analyze(UnaryExpr e) {
+        ValueType operandType = e.operand.dispatch(this);
+
+        switch(e.operator) {
+            case "-":
+                if (INT_TYPE.equals(operandType))
+                    return (e.inferredType = INT_TYPE);
+                else {
+                    typeError(e, String.format("Cannot apply operator `%s` on type `%s`", e.operator, operandType));
+                    return (e.inferredType = INT_TYPE);
+                }
+            case "not":
+                if (BOOL_TYPE.equals(operandType))
+                    return (e.inferredType = BOOL_TYPE);
+                else {
+                    typeError(e, String.format("Cannot apply operator `%s` on type `%s`", e.operator, operandType));
+                    return (e.inferredType = BOOL_TYPE);
+                }
+            default:
+                return (e.inferredType = OBJECT_TYPE);
+        }
     }
 
     @Override
@@ -163,6 +213,77 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
     }
 
     @Override
+    public ValueType analyze(IndexAssignStmt ias) {
+        ValueType listType = ias.listElement.list.dispatch(this);
+        ValueType indexType = ias.listElement.index.dispatch(this);
+        ValueType valueType = ias.value.dispatch(this);
+        ValueType elementType = null;
+
+        if (listType instanceof ListValueType)
+            elementType = ((ListValueType) listType).elementType;
+        else {
+            typeError(ias, String.format("`%s` is not a list type", ((ClassValueType) listType).className));
+            return null;
+        }
+
+        if (!indexType.equals(INT_TYPE)) {
+            typeError(ias, String.format("Index is of non-integer type `%s`", indexType));
+            return null;
+        }
+
+        if (!(elementType.equals(valueType) || OBJECT_TYPE.equals(elementType))) // Temporary, only checks superclass of Object, or if equal
+            typeError(ias, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) elementType).className, ((ClassValueType) valueType).className));
+
+        return null;
+    }
+
+    @Override
+    public ValueType analyze(IndexAssignExpr iae) {
+        ValueType listType = iae.listElement.list.dispatch(this);
+        ValueType indexType = iae.listElement.index.dispatch(this);
+        ValueType valueType = iae.value.dispatch(this);
+        ValueType elementType = null;
+
+        if (listType instanceof ListValueType)
+            elementType = ((ListValueType) listType).elementType;
+        else {
+            typeError(iae, String.format("`%s` is not a list type", ((ClassValueType) listType).className));
+            return (iae.inferredType = OBJECT_TYPE);
+        }
+
+        if (!indexType.equals(INT_TYPE)) {
+            typeError(iae, String.format("Index is of non-integer type `%s`", indexType));
+            return (iae.inferredType = valueType);
+        }
+
+        if (!(elementType.equals(valueType) || OBJECT_TYPE.equals(elementType))) // Temporary, only checks superclass of Object, or if equal
+            typeError(iae, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) elementType).className, ((ClassValueType) valueType).className));
+
+        return (iae.inferredType = valueType);
+    }
+
+    @Override
+    public ValueType analyze(IndexExpr ie) {
+        ValueType listType = ie.list.dispatch(this);
+        ValueType indexType = ie.index.dispatch(this);
+
+        if (listType instanceof ClassValueType) {
+            if (((ClassValueType) listType).className.equals("str")) {
+                ie.inferredType = STR_TYPE;
+            } else {
+                typeError(ie, String.format("Cannot index into type `%s`", ((ClassValueType) listType).className));
+                return (ie.inferredType = OBJECT_TYPE);
+            }
+        } else {
+            ie.inferredType = ((ListValueType) listType).elementType;
+        }
+
+        if (!INT_TYPE.equals(indexType))
+            typeError(ie, String.format("Index is of non-integer type `%s`", ((ClassValueType) indexType).className));
+        return ie.inferredType;
+    }
+
+    @Override
     public ValueType analyze(VarAssignStmt vas) {
         SymbolType varType = sym.get(vas.var.name);
         ValueType valueType = vas.value.dispatch(this);
@@ -170,13 +291,20 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         if (valueType == null)
             return null; // Prevents crashing if not implemented yet!
 
+        if (varType == null) {
+            typeError(vas, String.format("Not a variable: %s", vas.var.name));
+            return null;
+        }
+
         if (varType instanceof ClassValueType) {
             if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE))) // Temporary, only checks superclass of Object, or if equal
                 typeError(vas, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+        } else {
+            if (!(varType.equals(valueType))) {
+                if (!(vas.value instanceof ListExpr && ((ListExpr) vas.value).elements.size() == 0 || vas.value instanceof NoneLiteral))
+                    typeError(vas, String.format("Expected type `%s`; got type `%s`", varType, valueType));
+            }
         }
-
-        if (varType == null)
-            typeError(vas,String.format("Not a variable: %s", vas.var.name));
 
         return null;
     }
@@ -189,13 +317,20 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         if (valueType == null)
             return null; // Prevents crashing if not implemented yet!
 
-        if (varType instanceof ClassValueType) {
-            if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE))) // Temporary, only checks superclass of Object, or if equal
-                typeError(vae, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+        if (varType == null) {
+            typeError(vae, String.format("Not a variable: %s", vae.var.name));
+            return (vae.inferredType = valueType);
         }
 
-        if (varType == null)
-            typeError(vae,String.format("Not a variable: %s", vae.var.name));
+        if (varType instanceof ClassValueType) {
+            if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE) )) // Temporary, only checks superclass of Object, or if equal
+                typeError(vae, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+        } else {
+            if (!(varType.equals(valueType))) {
+                if (!(vae.value instanceof ListExpr && ((ListExpr) vae.value).elements.size() == 0 || vae.value instanceof NoneLiteral))
+                    typeError(vae, String.format("Expected type `%s`; got type `%s`", varType, valueType));
+            }
+        }
 
         return (vae.inferredType = valueType);
     }
