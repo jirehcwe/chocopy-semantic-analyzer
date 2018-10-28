@@ -163,6 +163,44 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
     }
 
     @Override
+    public ValueType analyze(VarAssignStmt vas) {
+        SymbolType varType = sym.get(vas.var.name);
+        ValueType valueType = vas.value.dispatch(this);
+
+        if (valueType == null)
+            return null; // Prevents crashing if not implemented yet!
+
+        if (varType instanceof ClassValueType) {
+            if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE))) // Temporary, only checks superclass of Object, or if equal
+                typeError(vas, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+        }
+
+        if (varType == null)
+            typeError(vas,String.format("Not a variable: %s", vas.var.name));
+
+        return null;
+    }
+
+    @Override
+    public ValueType analyze(VarAssignExpr vae) {
+        SymbolType varType = sym.get(vae.var.name);
+        ValueType valueType = vae.value.dispatch(this);
+
+        if (valueType == null)
+            return null; // Prevents crashing if not implemented yet!
+
+        if (varType instanceof ClassValueType) {
+            if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE))) // Temporary, only checks superclass of Object, or if equal
+                typeError(vae, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+        }
+
+        if (varType == null)
+            typeError(vae,String.format("Not a variable: %s", vae.var.name));
+
+        return (vae.inferredType = valueType);
+    }
+
+    @Override
     public ValueType analyze(ListExpr le) {
         ValueType curr = null;
         ValueType prev = null;
