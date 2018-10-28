@@ -59,6 +59,39 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
     }
 
     @Override
+    public ValueType analyze(VarDef vd) {
+        // This seems like it might be used often; move into separate helper function?
+        String literalType;
+        if (vd.value instanceof IntegerLiteral) {
+            literalType = "int";
+            vd.value.inferredType = INT_TYPE;
+        }
+        else if (vd.value instanceof StringLiteral) {
+            literalType = "str";
+            vd.value.inferredType = STR_TYPE;
+        }
+        else if (vd.value instanceof BooleanLiteral) {
+            literalType = "bool";
+            vd.value.inferredType = BOOL_TYPE;
+        }
+        else if (vd.value instanceof NoneLiteral) {
+            literalType = "object";
+            vd.value.inferredType = OBJECT_TYPE;
+        } else {
+            throw new java.lang.RuntimeException("Should never get here! VarDef Literal is not a literal class!");
+        }
+
+        if (vd.var.type instanceof ClassType) {
+            if (!((ClassType) vd.var.type).className.equals(literalType))
+                typeError(vd, String.format("Cannot declare variable `%s` to value type `%s`", vd.var.identifier.name, literalType));
+        } else {
+            if (!literalType.equals("object"))
+                typeError(vd, String.format("Cannot declare list variable `%s` to value `%s`", vd.var.identifier.name, literalType));
+        }
+        return null;
+    }
+
+    @Override
     public ValueType analyze(BinaryExpr e) {
         ValueType t1 = e.left.dispatch(this);
         ValueType t2 = e.right.dispatch(this);
