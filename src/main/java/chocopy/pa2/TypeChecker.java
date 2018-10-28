@@ -95,8 +95,12 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
                     return (e.inferredType = INT_TYPE);
                 } else if (STR_TYPE.equals(t1) && STR_TYPE.equals(t2)) {
                     return (e.inferredType = STR_TYPE);
-                } else if (t1 instanceof ListValueType && t2 instanceof ListValueType && t1.equals(t2)) {
-                    return (e.inferredType = t1); // UGLY WORKAROUND FOR LISTS, FIX LATER?
+                } else if (t1 instanceof ListValueType && t2 instanceof ListValueType) {
+                    if (t1.equals(t2))
+                        return (e.inferredType = t1); // UGLY WORKAROUND FOR LISTS, FIX LATER?
+                    else
+                        // If the lists are of different type, supposed to be superset, but object will always work. Edit later?
+                        return (e.inferredType = new ListValueType(OBJECT_TYPE));
                 } else {
                     typeError(e, String.format("Cannot apply operator `%s` on types `%s` and `%s`", e.operator, t1, t2));
                     if (INT_TYPE.equals(t1) || INT_TYPE.equals(t2)) {
@@ -158,7 +162,26 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
 
     }
 
-
+    @Override
+    public ValueType analyze(ListExpr le) {
+        ValueType curr = null;
+        ValueType prev = null;
+        boolean first = true;
+        for (Expr e : le.elements) {
+            if (first) {
+                first = false;
+                curr = e.dispatch(this);
+                prev = curr;
+            } else {
+                if (!prev.equals(e.dispatch(this)))
+                    curr = OBJECT_TYPE; // Again, ugly workaround to default to object type. Maybe fix later.
+                prev = e.dispatch(this);
+            }
+        }
+        if (first)
+            return (le.inferredType = OBJECT_TYPE); // Default to object if empty list
+        return (le.inferredType = new ListValueType(curr));
+    }
 
     @Override
     public ValueType analyze(Identifier id) {
