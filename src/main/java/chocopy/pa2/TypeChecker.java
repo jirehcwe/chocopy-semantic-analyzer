@@ -4,7 +4,8 @@ import chocopy.common.analysis.AbstractNodeAnalyzer;
 import chocopy.common.analysis.SymbolTable;
 import chocopy.common.analysis.types.SymbolType;
 import chocopy.common.analysis.types.ValueType;
-import  chocopy.common.analysis.types.ListValueType;
+import chocopy.common.analysis.types.ListValueType;
+import chocopy.common.analysis.types.ClassValueType;
 import chocopy.common.astnodes.*;
 
 import static chocopy.common.analysis.types.ValueType.INT_TYPE;
@@ -59,33 +60,25 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
     }
 
     @Override
+    public ValueType analyze(StringLiteral s) {
+        return (s.inferredType = ValueType.STR_TYPE);
+    }
+
+    @Override
+    public ValueType analyze(NoneLiteral n) {
+        return (n.inferredType = ValueType.OBJECT_TYPE);
+    }
+
+    @Override
     public ValueType analyze(VarDef vd) {
-        // This seems like it might be used often; move into separate helper function?
-        String literalType;
-        if (vd.value instanceof IntegerLiteral) {
-            literalType = "int";
-            vd.value.inferredType = INT_TYPE;
-        }
-        else if (vd.value instanceof StringLiteral) {
-            literalType = "str";
-            vd.value.inferredType = STR_TYPE;
-        }
-        else if (vd.value instanceof BooleanLiteral) {
-            literalType = "bool";
-            vd.value.inferredType = BOOL_TYPE;
-        }
-        else if (vd.value instanceof NoneLiteral) {
-            literalType = "object";
-            vd.value.inferredType = OBJECT_TYPE;
-        } else {
-            throw new java.lang.RuntimeException("Should never get here! VarDef Literal is not a literal class!");
-        }
+        ValueType literalType = vd.value.dispatch(this);
 
         if (vd.var.type instanceof ClassType) {
-            if (!((ClassType) vd.var.type).className.equals(literalType))
-                typeError(vd, String.format("Cannot declare variable `%s` to value type `%s`", vd.var.identifier.name, literalType));
+            // Ugly hack to check if var type is same as literal type.
+            if (!((ClassType) (vd.var.type)).className.equals(((ClassValueType) literalType).className))
+                typeError(vd, String.format("Cannot declare variable `%s` of type `%s` to value type `%s`", vd.var.identifier.name,((ClassType) (vd.var.type)).className, literalType));
         } else {
-            if (!literalType.equals("object"))
+            if (!literalType.equals(OBJECT_TYPE))
                 typeError(vd, String.format("Cannot declare list variable `%s` to value `%s`", vd.var.identifier.name, literalType));
         }
         return null;
