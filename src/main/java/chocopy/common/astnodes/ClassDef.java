@@ -17,8 +17,7 @@ public class ClassDef extends Declaration {
         this.declarations = declarations;
     }
 
-    public <T> T dispatch(NodeAnalyzer<T> analyzer) {
-        return analyzer.analyze(this);
+    public <T> T dispatch(NodeAnalyzer<T> analyzer) { return analyzer.analyze(this);
     }
 
     @Override
