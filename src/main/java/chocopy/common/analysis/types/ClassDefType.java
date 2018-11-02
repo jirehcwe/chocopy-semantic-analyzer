@@ -12,6 +12,5 @@ public class ClassDefType extends SymbolType{
         superclass = parent;
         className = self;
         currentScope = new SymbolTable<>();
-        currentScope.put("__init__", new FunctionDefType());
     }
 }

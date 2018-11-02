@@ -8,8 +8,8 @@ import java.util.List;
 public class FunctionDefType extends SymbolType {
     public String funcName;
     public SymbolTable<SymbolType> currentScope = new SymbolTable<>();
-    public List<TypedVar> params;
-    public TypeAnnotation returnType;
+    public List<SymbolType> params;
+    public ValueType returnType;
     public String outerFuncName;
 
 

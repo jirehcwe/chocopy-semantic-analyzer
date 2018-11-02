@@ -47,4 +47,19 @@ public class SymbolTable<T> {
         return this.parent;
     }
 
+    public boolean isNonlocal(String name) {
+        if (this.parent == null)
+            return false;
+        return this.parent.isNonlocalHelper(name);
+    }
+
+    private boolean isNonlocalHelper(String name) {
+        if (this.parent == null)
+            return false;
+        if (declares(name))
+            return true;
+        else
+            return this.parent.isNonlocalHelper(name);
+    }
+
 }

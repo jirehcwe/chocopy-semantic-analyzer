@@ -26,7 +26,6 @@ public class StudentAnalysis {
             // is a valid AST (i.e., not a syntax error)
             if (ast instanceof Program) {
                 Program program = (Program) ast;
-                SetPredefinedScope();
                 // Collect errors into this data structure
                 Errors errors = new Errors(new ArrayList<>());
                 // Pass: build symbol tables for global, function, and class scopes
@@ -53,21 +52,6 @@ public class StudentAnalysis {
             }
             return "{}";
         }
-    }
-
-    public static void SetPredefinedScope(){
-        globalScope = new SymbolTable<SymbolType>();
-        ClassDefType objclass = new ClassDefType(null, "object");
-        ClassDefType strclass = new ClassDefType(null, "str");
-        ClassDefType intclass = new ClassDefType(null, "int");
-        ClassDefType boolclass = new ClassDefType(null, "bool");
-        globalScope.put("object", objclass);
-        globalScope.put("str", strclass);
-        globalScope.put("int", intclass);
-        globalScope.put("bool", boolclass);
-        globalScope.put("print", new FunctionDefType());
-        globalScope.put("input", new FunctionDefType());
-        globalScope.put("__init__", new FunctionDefType());
     }
 
 }
