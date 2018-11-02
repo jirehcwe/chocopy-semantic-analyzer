@@ -21,3 +21,5 @@ Think about nonlocal, global, and class inheritance issues: can this symboltable
 whether defined in the current class or inherited from the superclass, cannot be redefined. Methods
 cannot be redefined in the same class. Inherited methods can be redefined as long as the return type and the
 types of all formal parameters except the first parameter are exactly the same."""
+
+Nonlocal, Global, and class shadowing must be done in 2nd pass

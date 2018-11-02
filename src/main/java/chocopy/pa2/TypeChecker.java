@@ -6,6 +6,8 @@ import chocopy.common.analysis.types.SymbolType;
 import chocopy.common.analysis.types.ValueType;
 import chocopy.common.analysis.types.ListValueType;
 import chocopy.common.analysis.types.ClassValueType;
+import chocopy.common.analysis.types.FunctionDefType;
+import chocopy.common.analysis.types.ClassDefType;
 import chocopy.common.astnodes.*;
 
 import static chocopy.common.analysis.types.ValueType.INT_TYPE;
@@ -17,6 +19,7 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
 
     // The current symbol table (changes depending on the function being analyzed)
     private SymbolTable<SymbolType> sym;
+    private SymbolTable<SymbolType> saved;
 
     /** Creates a type checker with a given type hierarchy and global symbol table. */
     public TypeChecker(SymbolTable<SymbolType> globalSymbols) {
@@ -44,9 +47,110 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
     }
 
     @Override
+    public ValueType analyze(FuncDef fdef) {
+        saved = sym;
+        sym = ((FunctionDefType) sym.get(fdef.name.name)).currentScope;
+        for (Declaration decl : fdef.declarations) {
+            decl.dispatch(this);
+        }
+        for (Stmt stmt : fdef.statements) {
+            stmt.dispatch(this);
+        }
+        sym = saved;
+        return null;
+    }
+
+    @Override
+    public ValueType analyze(ClassDef cdef) {
+        saved = sym;
+        sym = ((ClassDefType) sym.get(cdef.name.name)).currentScope;
+        for (Declaration decl : cdef.declarations) {
+            decl.dispatch(this);
+        }
+        sym = saved;
+        return null;
+    }
+
+    @Override
     public ValueType analyze(ExprStmt s) {
         s.expr.dispatch(this);
         return null;
+    }
+
+    @Override
+    public ValueType analyze(MemberAssignStmt mas) {
+        mas.objectMember.dispatch(this);
+        mas.objectMember.inferredType = null;
+        mas.value.dispatch(this);
+        return null;
+    }
+
+
+    @Override
+    public ValueType analyze(MemberExpr me) {
+        String classType = ((ClassValueType) me.object.dispatch(this)).className;
+        saved = sym;
+        sym = ((ClassDefType) sym.get(classType)).currentScope;
+        me.inferredType = me.member.dispatch(this);
+        me.member.inferredType = null;
+        sym = saved;
+        return me.inferredType;
+    }
+
+    @Override
+    public ValueType analyze(ReturnStmt rs) {
+        rs.value.dispatch(this);
+        return null;
+    }
+
+    @Override
+    public ValueType analyze(MethodCallExpr mce) {
+        ClassValueType classtype = (ClassValueType) mce.method.dispatch(this);
+        FunctionDefType fdt = (FunctionDefType) sym.get(classtype.className);
+        if (fdt.params.size() != mce.args.size()+1)
+            typeError(mce, String.format("Bad number of args!"));
+        int index = 1;
+        ValueType foo = null;
+        for (Expr e : mce.args) {
+            foo = e.dispatch(this);
+            if (!foo.equals(fdt.params.get(index)))
+                typeError(mce, String.format("Bad type of args!"));
+            index++;
+        }
+        mce.method.inferredType = null;
+        mce.inferredType = fdt.returnType;
+        return null;
+    }
+
+
+    @Override
+    public ValueType analyze(CallExpr ce) {
+        SymbolType type = sym.get(ce.function.name);
+        if (type instanceof FunctionDefType) {
+            FunctionDefType fdtype = ((FunctionDefType) type);
+            if (ce.args.size() != fdtype.params.size()) {
+                typeError(ce, String.format("Bad number of args!"));
+            }
+            for (Expr args : ce.args) {
+                args.dispatch(this);
+            }
+
+            return (ce.inferredType = fdtype.returnType);
+        } else {
+            ClassDefType cdtype = (ClassDefType) type;
+
+            FunctionDefType fdtype =(FunctionDefType) (cdtype.currentScope.get("__init__"));
+            // -1 because of self param
+            if (ce.args.size() != fdtype.params.size() - 1) {
+                typeError(ce, String.format("Bad number of args!"));
+            }
+            for (Expr args : ce.args) {
+                args.dispatch(this);
+            }
+
+            return (ce.inferredType = new ClassValueType(cdtype.className));
+
+        }
     }
     // For the While, If, and For loops, maybe have checks on condition/iterable?
     @Override
@@ -95,6 +199,9 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         return (n.inferredType = ValueType.OBJECT_TYPE);
     }
 
+    private boolean isSpecialClass(String foo) {
+        return foo.equals("int") || foo.equals("str") || foo.equals("bool");
+    }
     @Override
     public ValueType analyze(VarDef vd) {
         ValueType literalType = vd.value.dispatch(this);
@@ -102,7 +209,8 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         if (vd.var.type instanceof ClassType) {
             // Ugly hack to check if var type is same as literal type.
             if (!((ClassType) (vd.var.type)).className.equals(((ClassValueType) literalType).className))
-                typeError(vd, String.format("Cannot declare variable `%s` of type `%s` to value type `%s`", vd.var.identifier.name,((ClassType) (vd.var.type)).className, literalType));
+                if (! (!isSpecialClass(((ClassType) (vd.var.type)).className) && literalType.equals(OBJECT_TYPE)) )
+                    typeError(vd, String.format("Cannot declare variable `%s` of type `%s` to value type `%s`", vd.var.identifier.name,((ClassType) (vd.var.type)).className, literalType));
         } else {
             if (!literalType.equals(OBJECT_TYPE))
                 typeError(vd, String.format("Cannot declare list variable `%s` to value `%s`", vd.var.identifier.name, literalType));
@@ -298,6 +406,7 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
 
         if (varType instanceof ClassValueType) {
             if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE))) // Temporary, only checks superclass of Object, or if equal
+                if (! (!isSpecialClass(((ClassValueType) varType).className ) && valueType.equals(OBJECT_TYPE)) )
                 typeError(vas, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
         } else {
             if (!(varType.equals(valueType))) {
@@ -365,6 +474,12 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         // Assign type if possible
         if (varType instanceof ValueType) {
             return (id.inferredType = (ValueType) varType);
+        }
+        if (varType instanceof ClassDefType) {
+            return id.inferredType = new ClassValueType(((ClassDefType) varType).className);
+        }
+        if (varType instanceof FunctionDefType) {
+            return id.inferredType = new ClassValueType(((FunctionDefType) varType).funcName);
         }
 
         // On error, assume `object` type

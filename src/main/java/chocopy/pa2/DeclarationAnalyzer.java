@@ -22,6 +22,7 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
     private final SymbolTable<SymbolType> globals = sym;        // always global
     private final Errors errors;
     private boolean isInit = false;
+    private String currClass = null;
 
     public DeclarationAnalyzer(Errors errors) {
         this.errors = errors;
@@ -120,11 +121,19 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
             }
         }
 
+        // Check for return statements at top
+        for (Stmt stmt : program.statements) {
+            if (stmt instanceof ReturnStmt)
+                errors.add(new SemanticError(stmt, "Return statement cannot appear at the top level"));
+        }
+
         return null;
     }
 
     @Override
     public SymbolType analyze(VarDef varDef) {
+        if (varDef.var.type instanceof ClassType && sym.get(  ((ClassType) varDef.var.type).className  ) == null && !((ClassType) varDef.var.type).className.equals(currClass))
+            errors.add(new SemanticError(varDef.var.type, "Invalid type annotation; there is no class named: " + ((ClassType) varDef.var.type).className));
         return ValueType.annotationToValueType(varDef.var.type);
     }
 
@@ -151,6 +160,8 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
         SymbolType superclass = sym.get(current.superclass);
         SymbolTable<SymbolType> superScope = null;
         Set<String> superDefs = null;
+
+        currClass = current.className;
 
         // Some checking on invalid superclasses
         if (superclass == null) {
@@ -180,6 +191,12 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
             // Check duplicate
             if (sym.declares(name)) {
                 errors.add(new SemanticError(id, "Duplicate declaration of identifier in same scope: " + name));
+                continue;
+            }
+
+            // Check if shadows a class
+            if (sym.get(name) != null && sym.get(name) instanceof ClassDefType) {
+                errors.add(new SemanticError(id, "Cannot shadow class name: " + name));
                 continue;
             }
 
@@ -234,8 +251,10 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
             // Otherwise, copy it over
             sym.put(superDef, superScope.get(superDef));
         }
+        //((FunctionDefType) sym.get("__init__")).returnType = new ClassValueType(currClass);
 
         sym = sym.getParent();
+        currClass = null;
         return current;
     }
 
@@ -252,7 +271,14 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
                 continue;
             }
 
+            // Check if shadows a class
+            if (sym.get(tv.identifier.name) != null && sym.get(tv.identifier.name) instanceof ClassDefType) {
+                errors.add(new SemanticError(tv.identifier, "Cannot shadow class name: " + tv.identifier.name));
+                continue;
+            }
+
             SymbolType type = tv.dispatch(this);
+
             current.params.add(type);
             sym.put(tv.identifier.name, type);
         }
@@ -265,6 +291,12 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
             // Check duplicate
             if (sym.declares(name)) {
                 errors.add(new SemanticError(id, "Duplicate declaration of identifier in same scope: " + name));
+                continue;
+            }
+
+            // Check if shadows a class
+            if (sym.get(name) != null && sym.get(name) instanceof ClassDefType) {
+                errors.add(new SemanticError(id, "Cannot shadow class name: " + name));
                 continue;
             }
 
@@ -290,20 +322,16 @@ public class DeclarationAnalyzer extends AbstractNodeAnalyzer<SymbolType> {
 
 
     @Override
-    public SymbolType analyze(ReturnStmt returnStmt){
-        if (sym.declares("__init__")){
-            errors.add(new SemanticError(returnStmt, "Return statements should not appear in method: __init__"));
-        }
-        return null;
-    }
-
-    @Override
     public SymbolType analyze(TypedVar typedvar){
+        if (typedvar.type instanceof ClassType && sym.get(((ClassType) typedvar.type).className) == null && !((ClassType) typedvar.type).className.equals(currClass))
+            errors.add(new SemanticError(typedvar.type, "Invalid type annotation; there is no class named: " + ((ClassType) typedvar.type).className));
         return ValueType.annotationToValueType(typedvar.type);
     }
 
     @Override
     public SymbolType analyze(ClassType classType){
+        if (sym.get(classType.className) == null && !classType.className.equals(currClass))
+            errors.add(new SemanticError(classType, "Invalid type annotation; there is no class named: " + classType.className));
         return ValueType.annotationToValueType(classType);
     }
 
