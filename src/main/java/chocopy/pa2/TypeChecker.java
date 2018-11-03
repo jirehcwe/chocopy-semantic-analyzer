@@ -20,6 +20,8 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
     // The current symbol table (changes depending on the function being analyzed)
     private SymbolTable<SymbolType> sym;
     private SymbolTable<SymbolType> saved;
+    private FunctionDefType currFunc = null;
+    private FunctionDefType savedFunc = null;
 
     /** Creates a type checker with a given type hierarchy and global symbol table. */
     public TypeChecker(SymbolTable<SymbolType> globalSymbols) {
@@ -50,6 +52,8 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
     public ValueType analyze(FuncDef fdef) {
         saved = sym;
         sym = ((FunctionDefType) sym.get(fdef.name.name)).currentScope;
+        savedFunc = currFunc;
+        currFunc = ((FunctionDefType) sym.get(fdef.name.name));
         for (Declaration decl : fdef.declarations) {
             decl.dispatch(this);
         }
@@ -57,6 +61,7 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
             stmt.dispatch(this);
         }
         sym = saved;
+        currFunc = savedFunc;
         return null;
     }
 
@@ -82,6 +87,10 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         mas.objectMember.dispatch(this);
         mas.objectMember.inferredType = null;
         mas.value.dispatch(this);
+        if (mas.objectMember.typeError != null && mas.objectMember.typeError.substring(0, 28).equals("There is no attribute named ")) {
+            mas.typeError = mas.objectMember.typeError;
+            mas.objectMember.typeError = null;
+        }
         return null;
     }
 
@@ -94,32 +103,66 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         me.inferredType = me.member.dispatch(this);
         me.member.inferredType = null;
         sym = saved;
+        if (me.member.typeError != null && me.member.typeError.substring(0, 16).equals("Not a variable: ")) {
+            me.member.typeError = null;
+            typeError(me, String.format("There is no attribute named `%s` in class `%s`", me.member.name, me.object.inferredType));
+        }
         return me.inferredType;
     }
 
     @Override
     public ValueType analyze(ReturnStmt rs) {
-        rs.value.dispatch(this);
+        if (rs.value == null) {
+            typeError(rs, String.format("Expected type `%s`; got `None`", currFunc.returnType));
+            return null;
+        }
+
+        ValueType returntype = rs.value.dispatch(this);
+        if (!(returntype.equals(currFunc.returnType)))
+            if (rs.value instanceof NoneLiteral)
+                typeError(rs, String.format("Expected type `%s`; got `None`", currFunc.returnType));
+            else
+                typeError(rs, String.format("Expected type `%s`; got type `%s`", currFunc.returnType, returntype));
         return null;
     }
 
     @Override
     public ValueType analyze(MethodCallExpr mce) {
         ClassValueType classtype = (ClassValueType) mce.method.dispatch(this);
+        if (!(sym.get(classtype.className) instanceof FunctionDefType)) {
+            typeError(mce, String.format("There is no method named `%s` in class `%s`", mce.method.member.name, mce.method.object.inferredType));
+            mce.method.inferredType = null;
+            mce.method.typeError = null;
+            mce.inferredType = OBJECT_TYPE;
+            return mce.inferredType;
+        }
         FunctionDefType fdt = (FunctionDefType) sym.get(classtype.className);
-        if (fdt.params.size() != mce.args.size()+1)
-            typeError(mce, String.format("Bad number of args!"));
+        //System.out.println(mce.args.size() + "    " + fdt.params.size());
+        if (fdt.params.size() != mce.args.size()+1) {
+            typeError(mce, String.format("Expected %d arguments; got %d", fdt.params.size()-1, mce.args.size()));
+            // analyze args anyway
+            for (Expr e : mce.args)
+                e.dispatch(this);
+            mce.method.inferredType = null;
+            mce.inferredType = fdt.returnType;
+            return mce.inferredType;
+        }
         int index = 1;
         ValueType foo = null;
+        // Check args
         for (Expr e : mce.args) {
+            //System.out.println(mce.args.size() + "    " + fdt.params.size());
             foo = e.dispatch(this);
             if (!foo.equals(fdt.params.get(index)))
-                typeError(mce, String.format("Bad type of args!"));
+                if (e instanceof NoneLiteral)
+                    typeError(mce, String.format("Expected type `%s`; got `None` in parameter %d", fdt.params.get(index), index));
+                else
+                    typeError(mce, String.format("Expected type `%s`; got type `%s` in parameter %d", fdt.params.get(index), foo, index));
             index++;
         }
         mce.method.inferredType = null;
         mce.inferredType = fdt.returnType;
-        return null;
+        return mce.inferredType;
     }
 
 
@@ -129,27 +172,77 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         if (type instanceof FunctionDefType) {
             FunctionDefType fdtype = ((FunctionDefType) type);
             if (ce.args.size() != fdtype.params.size()) {
-                typeError(ce, String.format("Bad number of args!"));
+                typeError(ce, String.format("Expected %d arguments; got %d", fdtype.params.size(), ce.args.size()));
+
+                // analyze args but do not compare
+                for (Expr args : ce.args)
+                    args.dispatch(this);
+
+                return (ce.inferredType = fdtype.returnType);
             }
+
+
+            int index = 0;
+            ValueType foo = null;
             for (Expr args : ce.args) {
-                args.dispatch(this);
+                foo = args.dispatch(this);
+                if (foo == null) {
+                    index++;
+                    continue; //Why? idunno. Probably unimplemented node analyze
+                }
+                if (!foo.equals(fdtype.params.get(index)) && !(fdtype.params.get(index).equals(OBJECT_TYPE)))
+                    if (args instanceof NoneLiteral)
+                        typeError(ce, String.format("Expected type `%s`; got `None` in parameter %d", fdtype.params.get(index), index));
+                    else
+                        typeError(ce, String.format("Expected type `%s`; got type `%s` in parameter %d", fdtype.params.get(index), foo, index));
+                index++;
             }
 
             return (ce.inferredType = fdtype.returnType);
-        } else {
+        }
+        else if (type instanceof ClassDefType) {
             ClassDefType cdtype = (ClassDefType) type;
 
             FunctionDefType fdtype =(FunctionDefType) (cdtype.currentScope.get("__init__"));
             // -1 because of self param
             if (ce.args.size() != fdtype.params.size() - 1) {
-                typeError(ce, String.format("Bad number of args!"));
+                typeError(ce, String.format("Expected %d arguments; got %d", fdtype.params.size()-1, ce.args.size()));
+
+                // analyze args but do not compare
+                for (Expr args : ce.args)
+                    args.dispatch(this);
+
+                return (ce.inferredType = fdtype.returnType);
             }
+
+            int index = 1;
+            ValueType foo = null;
             for (Expr args : ce.args) {
-                args.dispatch(this);
+                //System.out.println(mce.args.size() + "    " + fdt.params.size());
+                foo = args.dispatch(this);
+                //System.out.println(foo + "    " + fdtype.params.get(index));
+                if (!foo.equals(fdtype.params.get(index)) && !(fdtype.params.get(index).equals(OBJECT_TYPE)))
+                    if (args instanceof NoneLiteral)
+                        typeError(ce, String.format("Expected type `%s`; got `None` in parameter %d", fdtype.params.get(index), index));
+                    else
+                        typeError(ce, String.format("Expected type `%s`; got type `%s` in parameter %d", fdtype.params.get(index), foo, index));
+                index++;
             }
+
+
+
 
             return (ce.inferredType = new ClassValueType(cdtype.className));
+        }
+        else if (type == null) {
+            for (Expr args : ce.args)
+                args.dispatch(this);
+            typeError(ce, String.format("Not a function or class: %s", ce.function.name));
+            return (ce.inferredType = OBJECT_TYPE);
 
+        }
+        else {
+            return null; // SHOULD NEVER GET HERE
         }
     }
     // For the While, If, and For loops, maybe have checks on condition/iterable?
@@ -210,7 +303,8 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
             // Ugly hack to check if var type is same as literal type.
             if (!((ClassType) (vd.var.type)).className.equals(((ClassValueType) literalType).className))
                 if (! (!isSpecialClass(((ClassType) (vd.var.type)).className) && literalType.equals(OBJECT_TYPE)) )
-                    typeError(vd, String.format("Cannot declare variable `%s` of type `%s` to value type `%s`", vd.var.identifier.name,((ClassType) (vd.var.type)).className, literalType));
+                    // typeError(vd, String.format("Cannot declare variable `%s` of type `%s` to value type `%s`", vd.var.identifier.name,((ClassType) (vd.var.type)).className, literalType));
+                    typeError(vd, String.format("Expected type `%s`; got type `%s`", ((ClassType) (vd.var.type)).className, literalType));
         } else {
             if (!literalType.equals(OBJECT_TYPE))
                 typeError(vd, String.format("Cannot declare list variable `%s` to value `%s`", vd.var.identifier.name, literalType));
