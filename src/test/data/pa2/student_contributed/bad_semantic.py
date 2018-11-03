@@ -1,4 +1,9 @@
-x:int = 1
-x:int = 2
+class A(object):
+    a:str = "Hi"
 
-x
+b:str = "Ho"
+
+class B(b):
+    c:str = "He"
+
+A()

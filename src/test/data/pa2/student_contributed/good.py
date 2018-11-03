@@ -1,6 +1,5 @@
-x:int = 1
+x:str = "hi"
 
-class A(object):
-    x:int = 1
+b:object = None
 
-A()
+x = b = "hey"

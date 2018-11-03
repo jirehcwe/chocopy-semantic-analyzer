@@ -9,6 +9,7 @@ import chocopy.common.analysis.types.ClassValueType;
 import chocopy.common.analysis.types.FunctionDefType;
 import chocopy.common.analysis.types.ClassDefType;
 import chocopy.common.astnodes.*;
+import proguard.evaluation.value.Value;
 
 import static chocopy.common.analysis.types.ValueType.INT_TYPE;
 import static chocopy.common.analysis.types.ValueType.BOOL_TYPE;
@@ -500,8 +501,22 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
 
         if (varType instanceof ClassValueType) {
             if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE))) // Temporary, only checks superclass of Object, or if equal
-                if (! (!isSpecialClass(((ClassValueType) varType).className ) && valueType.equals(OBJECT_TYPE)) )
-                typeError(vas, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+                if (! (!isSpecialClass(((ClassValueType) varType).className ) && valueType.equals(OBJECT_TYPE)) ) {
+//                    ClassDefType cvt;
+//                    cvt = (ClassDefType)sym.get(valueType.toString());
+//
+//                    //
+//                    do {
+//                        if (cvt.superclass.equals(((ClassValueType) varType).className)) {
+//                            return null;
+//                        }
+//                        cvt = (ClassDefType)sym.get(cvt.superclass);
+//                    } while(!cvt.className.equals("object"));
+
+                    typeError(vas, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+
+                    //
+                }
         } else {
             if (!(varType.equals(valueType))) {
                 if (!(vas.value instanceof ListExpr && ((ListExpr) vas.value).elements.size() == 0 || vas.value instanceof NoneLiteral))
@@ -526,12 +541,24 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         }
 
         if (varType instanceof ClassValueType) {
-            if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE) )) // Temporary, only checks superclass of Object, or if equal
+            if (!(varType.equals(valueType) || varType.equals(OBJECT_TYPE) )) { // Temporary, only checks superclass of Object, or if equal
+//                ClassDefType cvt;
+//                cvt = (ClassDefType)sym.get(valueType.toString());
+//                //
+//                do {
+//                    if (cvt.superclass == ((ClassValueType) varType).className) {
+//                        return (vae.inferredType = valueType);
+//                    }
+//                    cvt =  (ClassDefType)sym.get(cvt.superclass);
+//                } while(!cvt.className.equals("object"));
                 typeError(vae, String.format("Expected type `%s`; got type `%s`", ((ClassValueType) varType).className, ((ClassValueType) valueType).className));
+                //
+            }
         } else {
             if (!(varType.equals(valueType))) {
-                if (!(vae.value instanceof ListExpr && ((ListExpr) vae.value).elements.size() == 0 || vae.value instanceof NoneLiteral))
+                if (!(vae.value instanceof ListExpr && ((ListExpr) vae.value).elements.size() == 0 || vae.value instanceof NoneLiteral)) {
                     typeError(vae, String.format("Expected type `%s`; got type `%s`", varType, valueType));
+                }
             }
         }
 
@@ -580,4 +607,6 @@ public class TypeChecker extends AbstractNodeAnalyzer<ValueType> {
         typeError(id, "Not a variable: " + varName);
         return (id.inferredType = ValueType.OBJECT_TYPE);
     }
+
+
 }
