@@ -54,8 +54,20 @@ git pull upstream master
 
 ## Submission writeup
 
-Team member 1: 
+Team member 1: Dean Li
 
-Team member 2: 
+Team member 2: Jireh Chew
 
-(Students should edit this section with their write-up)
+1) Our semantic analysis does 2 passes on the AST, 1 DeclarationAnalyzer to store all declarations in a symbol table
+and the other pass TypeChecker to ensure the program is properly checked.
+
+2) Implementing the global and nonlocal scoping of ChocoPy. It was difficult to process outer scope and pass in proper
+parameters to the GlobalDecl and NonlocalDecl analyzers to map the variables to the proper scope, so we had to create 
+better SymbolTypes to hold information and references to the parent SymbolTables.
+
+3) For example, we cannot allow "Hi" - 3 to take on the inferred type object, as we cannot resolve the arithmetic operation
+between them, and should not assume the type of a which the expression is assigned to as an object.
+
+4) We ensure that our primitive types will be distinguishable from created objects. Furthermore, when the compiler tries to 
+optimise in subsequent steps, it can ensure that the value is applicable and does not need to bother if we are doing 
+operations using a null value as it is guaranteed to be not null. For example, we need to handle the case of a null value of an int multipled by e.g 5 (5 * null). Thus, we know the result is also an int if it is guaranteed to be non-null.
